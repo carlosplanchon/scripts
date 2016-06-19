@@ -1,86 +1,86 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 
-A='\033[1;33m'
+Y='\033[1;33m'
 R='\033[0;31m'
 F='\033[0m'
 
-function limpiar
+function clean
 {
-    echo -e $A'Limpiando la cache apt...'$F
+    echo -e $Y'Cleaning apt cache...'$F
     apt-get -y clean
 
-    echo -e $A'Eliminando paquetes huerfanos...'$F
+    echo -e $Y'Removing orphan packages ...'$F
     apt-get -y autoremove
 
-    echo -e $A'Eliminando paquetes viejos...'$F
+    echo -e $Y'Removing old packages...'$F
     apt-get -y autoclean
 
-    echo -e $A'Removiendo viejos archivos de configuración...'$F
+    echo -e $Y'Removing old configuration files...'$F
     apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
 
-    echo -e $A'Removiendo viejos kernels (si los hay)...'$F
+    echo -e $Y'Removing old kernels (if exists)...'$F
     ls /boot/ | grep vmlinuz | sed 's@vmlinuz-@linux-image-@g' | sed '$d' | sed '$d' > /tmp/kernelList
     if [ -s /tmp/kernelList ]; then
-        echo -e $A'Se eliminarán los siguientes kernels\n`cat /tmp/kernelList`'$F
-        notify-send 'Xubucleaner' 'Se está operando sobre el kernel.'
+        echo -e $Y'The following kernels will be removed\n`cat /tmp/kernelList`'$F
+        notify-send 'Xubucleaner' 'Operating on kernel.'
         for I in `cat /tmp/kernelList`; do
             apt-get remove $I
-            echo -e $A'Eliminando $I...'$F
+            echo -e $Y'Removing $I...'$F
         done
         rm -f /tmp/kernelList
-        echo -e $A'Actualizando gestor de arranque...'$F
+        echo -e $Y'Updating grub...'$F
         update-grub
     fi
 
-    echo -e $A'Limpiando imágenes en miniatura...'$F
+    echo -e $Y'Removing thumbnails...'$F
     rm -rf /home/*/.thumbnails/large/*
     rm -rf /home/*/.thumbnails/normal/*
 
-    echo -e $A'Limpiando caché'$F
+    echo -e $Y'Cleaning cache'$F
     rm -rf /home/*/.cache/*
 
-    echo -e $A'Limpiando archivos temporales...'$F
+    echo -e $Y'Cleaning temporal files...'$F
     rm -rf /tmp/*
     rm -rf /var/tmp/*
 
-    echo -e $A'Limpiando registros...(si existen en este sistema)'$F
+    echo -e $Y'Cleaning logs...(if exists in this system)'$F
     rm /usr/bin/TEST.log
     rm /usr/bin/RECV.log
     rm /usr/bin/SENT.log
 }
 
 if [ $USER != root ]; then
-  echo -e $R'Error: tenes que ser root'
-  echo -e $A'Saliendo...'$F
-  notify-send 'Xubucleaner' 'Tenés que ejecutar este programa como root'
+  echo -e $R'Error: You must be root'
+  echo -e $Y'Exiting...'$F
+  notify-send 'Xubucleaner' 'You must execute this script as root'
   exit 0
 fi
 clear
-notify-send 'Xubucleaner' 'Iniciando limpieza...'
+notify-send 'Xubucleaner' 'Starting maintenance...'
 
-echo -e $A'Limpiando las papeleras...'$F
+echo -e $Y'Emptying trash...'$F
 rm -rf /home/*/.local/share/Trash/*
 rm -rf /root/.local/share/Trash/*
 
-limpiar
+clean
 
-echo -e $A'Arreglando paquetes rotos (si los hay)...'$F
+echo -e $Y'Fixing damaged packages (if exists)...'$F
 apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -f install
 dpkg --configure -a
 apt-get check
 
-echo -e $A'Obteniendo información de los repositorios...'$F
+echo -e $Y'Getting repository lists...'$F
 apt-get -y update
 
-echo -e $A'Actualizándo programas...'$F
+echo -e $Y'Updating programs...'$F
 apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages upgrade
 
-echo -e $A'Actualizándo kernel...'$F
+echo -e $Y'Updating kernel...'$F
 apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages dist-upgrade
 
-limpiar
+clean
 
-echo -e $A'--- SE RECOMIENDA REINICIAR EL SISTEMA ---!'$F
-echo -e $A'Script finalizado - edición por: Carlos A. Planchón!'$F
-notify-send 'Xubucleaner' 'Listo!'
+echo -e $Y'--- YOU SHOULD REBOOT THE SYSTEM ---!'$F
+echo -e $Y'Script execution done - edited by: Carlos A. Planchón!'$F
+notify-send 'Xubucleaner' 'Ready!'
