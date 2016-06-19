@@ -15,9 +15,9 @@ function copy_logo
 }
 
 if [ $USER != root ]; then
-  echo -e $R'Error: You have to be root'
-  echo -e $A'Exiting...'$F
-  notify-send 'Better_lubuntu_logo:' 'You have to execute this program as root'
+  echo -e $R'Error: You must be root'
+  echo -e $Y'Exiting...'$F
+  notify-send 'My_lubuntu_logo' 'You must execute this script as root'
   exit 0
 fi
 
