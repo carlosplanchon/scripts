@@ -12,6 +12,9 @@ function copy_logo
 
     echo -e $A'Copying logo...'$F
     sudo cp lubuntu-logo-2.png /usr/share/lubuntu/images/
+    
+    echo -e $A'Removing downloaded file...'$F
+    rm lubuntu-logo-2.png
 }
 
 if [ $USER != root ]; then
