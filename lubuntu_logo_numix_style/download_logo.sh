@@ -8,7 +8,7 @@ F='\033[0m'
 function copy_logo
 {
     echo -e $A'Downloading logo...'$F
-    wget https://github.com/carlosplanchon/scripts/blob/master/lubuntu-logo-2.png
+    wget https://raw.githubusercontent.com/carlosplanchon/scripts/master/lubuntu_logo_numix_style/lubuntu-logo-2.png
 
     echo -e $A'Copying logo...'$F
     sudo cp lubuntu-logo-2.png /usr/share/lubuntu/images/
