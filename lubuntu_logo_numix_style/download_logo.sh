@@ -8,13 +8,7 @@ F='\033[0m'
 function copy_logo
 {
     echo -e $A'Downloading logo...'$F
-    wget https://raw.githubusercontent.com/carlosplanchon/scripts/master/lubuntu_logo_numix_style/lubuntu-logo-2.png
-
-    echo -e $A'Copying logo...'$F
-    sudo cp lubuntu-logo-2.png /usr/share/lubuntu/images/
-    
-    echo -e $A'Removing downloaded file...'$F
-    rm lubuntu-logo-2.png
+    wget https://raw.githubusercontent.com/carlosplanchon/scripts/master/lubuntu_logo_numix_style/lubuntu-logo-2.png -P /usr/share/lubuntu/images/
 }
 
 if [ $USER != root ]; then
@@ -23,6 +17,10 @@ if [ $USER != root ]; then
   notify-send 'My_lubuntu_logo' 'You must execute this script as root'
   exit 0
 fi
+
+copy_logo
+
+echo -e $A'Script execution done. - created by: Carlos A. Planchón!'$F
 
 copy_logo
 
