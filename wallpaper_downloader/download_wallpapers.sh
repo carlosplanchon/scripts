@@ -8,13 +8,7 @@ F='\033[0m'
 function copy_wallpaper
 {
     echo -e $A'Downloading wallpaper...'$F
-    wget https://raw.githubusercontent.com/carlosplanchon/scripts/master/wallpaper_downloader/_m_._e__h__9043.jpg
-
-    echo -e $A'Copying wallpaper...'$F
-    sudo cp _m_._e__h__9043.jpg /usr/share/lubuntu/wallpapers
-
-    echo -e $A'Removing downloaded file...'$F
-    rm _m_._e__h__9043.jpg
+    wget https://raw.githubusercontent.com/carlosplanchon/scripts/master/wallpaper_downloader/_m_._e__h__9043.jpg -P /usr/share/lubuntu/wallpapers
 }
 
 if [ $USER != root ]; then
