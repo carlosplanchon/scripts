@@ -21,7 +21,3 @@ fi
 copy_logo
 
 echo -e $A'Script execution done. - created by: Carlos A. Planchón!'$F
-
-copy_logo
-
-echo -e $A'Script execution done. - created by: Carlos A. Planchón!'$F
