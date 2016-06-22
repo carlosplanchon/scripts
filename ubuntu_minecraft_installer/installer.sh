@@ -1,6 +1,10 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 
+A='\033[1;33m'
+R='\033[0;31m'
+F='\033[0m'
+
 function install_minecraft
 {
     echo -e $A'Adding Oracle Java Repository...'$F
@@ -9,7 +13,7 @@ function install_minecraft
     echo -e $A'Updating repositories...'$F
     apt-get update
 
-    echo -e $A'Installing Java8...'$F
+    echo -e $A'Installing Oracle Java 8...'$F
     echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
     echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
     echo -e $A'License accepted...'$F
