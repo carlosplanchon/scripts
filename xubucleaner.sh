@@ -8,16 +8,16 @@ F='\033[0m'
 function clean
 {
     echo -e $Y'Cleaning apt cache...'$F
-    apt-get -y clean
+    apt clean
 
     echo -e $Y'Removing orphan packages ...'$F
-    apt-get -y autoremove
+    apt autoremove
 
     echo -e $Y'Removing old packages...'$F
-    apt-get -y autoclean
+    apt autoclean
 
     echo -e $Y'Removing old configuration files...'$F
-    apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
+    apt --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
 
     echo -e $Y'Removing old kernels (if exists)...'$F
     ls /boot/ | grep vmlinuz | sed 's@vmlinuz-@linux-image-@g' | sed '$d' | sed '$d' > /tmp/kernelList
@@ -66,18 +66,18 @@ rm -rf /root/.local/share/Trash/*
 clean
 
 echo -e $Y'Fixing damaged packages (if exists)...'$F
-apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -f install
+apt --allow-downgrades --allow-remove-essential --allow-change-held-packages -f install
 dpkg --configure -a
 apt-get check
 
 echo -e $Y'Getting repository lists...'$F
-apt-get -y update
+apt update
 
 echo -e $Y'Updating programs...'$F
-apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages upgrade
+apt --allow-downgrades --allow-remove-essential --allow-change-held-packages upgrade
 
 echo -e $Y'Updating kernel...'$F
-apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages dist-upgrade
+apt --allow-downgrades --allow-remove-essential --allow-change-held-packages dist-upgrade
 
 clean
 
