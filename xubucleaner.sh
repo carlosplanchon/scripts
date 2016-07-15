@@ -26,7 +26,7 @@ function clean
         notify-send 'Xubucleaner' 'Operating on kernel.'
         for I in `cat /tmp/kernelList`; do
             apt remove $I
-            echo -e $Y'Removing $I...'$F
+            echo -e $Y'Removing ...'$I$F
         done
         rm -f /tmp/kernelList
         echo -e $Y'Updating grub...'$F
