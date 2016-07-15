@@ -73,11 +73,8 @@ apt-get check
 echo -e $Y'Getting repository lists...'$F
 apt update
 
-echo -e $Y'Updating programs...'$F
-apt --allow-downgrades --allow-remove-essential --allow-change-held-packages upgrade
-
-echo -e $Y'Updating kernel...'$F
-apt --allow-downgrades --allow-remove-essential --allow-change-held-packages dist-upgrade
+echo -e $Y'Updating programs and kernel...'$F
+apt --allow-downgrades --allow-remove-essential --allow-change-held-packages -y dist-upgrade
 
 clean
 
