@@ -11,13 +11,13 @@ function clean
     apt clean
 
     echo -e $Y'Removing orphan packages ...'$F
-    apt autoremove
+    apt -y autoremove
 
     echo -e $Y'Removing old packages...'$F
     apt autoclean
 
     echo -e $Y'Removing old configuration files...'$F
-    apt --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
+    apt -y --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
 
     echo -e $Y'Removing old kernels (if exists)...'$F
     ls /boot/ | grep vmlinuz | sed 's@vmlinuz-@linux-image-@g' | sed '$d' | sed '$d' > /tmp/kernelList
@@ -25,7 +25,7 @@ function clean
         echo -e $Y'The following kernels will be removed\n`cat /tmp/kernelList`'$F
         notify-send 'Xubucleaner' 'Operating on kernel.'
         for I in `cat /tmp/kernelList`; do
-            apt-get remove $I
+            apt remove $I
             echo -e $Y'Removing $I...'$F
         done
         rm -f /tmp/kernelList
