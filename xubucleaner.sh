@@ -37,7 +37,7 @@ function clean
     rm -rf /home/*/.thumbnails/large/*
     rm -rf /home/*/.thumbnails/normal/*
 
-    echo -e $Y'Cleaning cache'$F
+    echo -e $Y'Cleaning cache...'$F
     rm -rf /home/*/.cache/*
 
     echo -e $Y'Cleaning temporal files...'$F
