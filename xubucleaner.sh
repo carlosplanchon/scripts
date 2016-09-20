@@ -25,8 +25,8 @@ function clean
         echo -e $Y'The following kernels will be removed\n`cat /tmp/kernelList`'$F
         notify-send 'Xubucleaner' 'Operating on kernel.'
         for I in `cat /tmp/kernelList`; do
-            apt remove $I
-            echo -e $Y'Removing ...'$I$F
+            apt remove -y $I
+            echo -e $Y'Removing $I...'$F
         done
         rm -f /tmp/kernelList
         echo -e $Y'Updating grub...'$F
@@ -37,7 +37,7 @@ function clean
     rm -rf /home/*/.thumbnails/large/*
     rm -rf /home/*/.thumbnails/normal/*
 
-    echo -e $Y'Cleaning cache...'$F
+    echo -e $Y'Cleaning cache'$F
     rm -rf /home/*/.cache/*
 
     echo -e $Y'Cleaning temporal files...'$F
