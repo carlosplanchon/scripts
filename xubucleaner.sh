@@ -17,7 +17,7 @@ function clean
     apt autoclean
 
     echo -e $Y'Removing old configuration files...'$F
-    apt -y --allow-downgrades --allow-remove-essential --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
+    apt -y --allow-downgrades --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
 
     echo -e $Y'Removing old kernels (if exists)...'$F
     ls /boot/ | grep vmlinuz | sed 's@vmlinuz-@linux-image-@g' | sed '$d' | sed '$d' > /tmp/kernelList
@@ -66,7 +66,7 @@ rm -rf /root/.local/share/Trash/*
 clean
 
 echo -e $Y'Fixing damaged packages (if exists)...'$F
-apt --allow-downgrades --allow-remove-essential --allow-change-held-packages -f install
+apt --allow-downgrades --allow-change-held-packages -f install
 dpkg --configure -a
 apt-get check
 
@@ -74,7 +74,7 @@ echo -e $Y'Getting repository lists...'$F
 apt update
 
 echo -e $Y'Updating programs and kernel...'$F
-apt --allow-downgrades --allow-remove-essential --allow-change-held-packages -y dist-upgrade
+apt --allow-downgrades --allow-change-held-packages -y dist-upgrade
 
 clean
 
