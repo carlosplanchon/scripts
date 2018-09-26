@@ -54,7 +54,7 @@ def check_images_on_pool(list_of_files_to_check, max_workers=20):
             )
 
 
-def check_corrupted_images(
+def get_corrupted_images(
     folder_to_check,
     file_extensions_list,
     max_workers=20
