@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from concurrent.futures import ProcessPoolExecutor
+from multiprocessing import cpu_count
 from os import walk
 from os.path import join as pjoin
 from subprocess import Popen, PIPE
@@ -44,7 +45,7 @@ def get_files_to_check(folder_to_check, file_extensions_list):
     return files_to_check
 
 
-def check_images_on_pool(list_of_files_to_check, max_workers=20):
+def check_images_on_pool(list_of_files_to_check, max_workers):
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         return executor.map(
             is_image_corrupted,
@@ -56,7 +57,7 @@ def check_images_on_pool(list_of_files_to_check, max_workers=20):
 def get_corrupted_images(
     folder_to_check,
     file_extensions_list,
-    max_workers=20
+    max_workers=cpu_count()
         ):
 
     files_to_check = get_files_to_check(folder_to_check, file_extensions_list)
