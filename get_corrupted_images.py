@@ -34,7 +34,6 @@ def is_image_corrupted(file_path, verbose=verbose):
 def get_files_to_check(folder_to_check, file_extensions_list):
     files_to_check = []
 
-
     for file_extension in file_extensions_list:
         for directory, subdirectories, files, in walk(folder_to_check):
             for file in files:
