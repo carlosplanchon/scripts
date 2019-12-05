@@ -1,83 +1,122 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 
-Y='\033[1;33m'
-R='\033[0;31m'
-F='\033[0m'
+Y="\033[1;33m"
+R="\x1b[38;5;9m\x1b[1m"
+F="\033[0m"
 
-function clean
+
+function purge_old_kernels
 {
-    echo -e $Y'Cleaning apt cache...'$F
-    apt clean
+    echo -e $Y"· Removing old kernels (if there are)..."$F
+    # purge-old-kernels - remove old kernel packages
+    #    Copyright (C) 2012 Dustin Kirkland <kirkland -(at)- ubuntu.com>
+    #
+    #    Authors: Dustin Kirkland <kirkland-(at)-ubuntu.com>
+    #             Kees Cook <kees-(at)-ubuntu.com>
+    #
+    # NOTE: This script will ALWAYS keep the currently running kernel
+    # NOTE: Default is to keep 2 more.
+    KEEP=1
+    APT_OPTS=
+    while [ ! -z "$1" ]; do
+        case "$1" in
+            --keep)
+                KEEP="$2"
+                shift 2
+            ;;
+            *)
+                APT_OPTS="$APT_OPTS $1"
+                shift 1
+            ;;
+        esac
+    done
 
-    echo -e $Y'Removing orphan packages ...'$F
-    apt -y autoremove
+    # Build our list of kernel packages to purge.
+    CANDIDATES=$(ls -tr /boot/vmlinuz-* | head -n -${KEEP} | grep -v "$(uname -r)$" | cut -d- -f2- | awk '{print "linux-image-" $0 " linux-headers-" $0}' )
+    for c in $CANDIDATES; do
+        dpkg-query -s "$c" >/dev/null 2>&1 && PURGE="$PURGE $c"
+    done
 
-    echo -e $Y'Removing old packages...'$F
-    apt autoclean
-
-    echo -e $Y'Removing old configuration files...'$F
-    apt -y --allow-downgrades --allow-change-held-packages purge $(dpkg -l|grep '^rc'|awk '{print $2}')
-
-    echo -e $Y'Removing old kernels (if exists)...'$F
-    ls /boot/ | grep vmlinuz | sed 's@vmlinuz-@linux-image-@g' | sed '$d' | sed '$d' > /tmp/kernelList
-    if [ -s /tmp/kernelList ]; then
-        echo -e $Y'The following kernels will be removed\n`cat /tmp/kernelList`'$F
-        notify-send 'Xubucleaner' 'Operating on kernel.'
-        for I in `cat /tmp/kernelList`; do
-            apt remove -y $I
-            echo -e $Y'Removing $I...'$F
-        done
-        rm -f /tmp/kernelList
-        echo -e $Y'Updating grub...'$F
-        update-grub
+    if [ -z "$PURGE" ]; then
+        echo -e $Y"- No kernels are eligible for removal."$F
     fi
 
-    echo -e $Y'Removing thumbnails...'$F
+    sudo apt $APT_OPTS remove -y --purge $PURGE;    
+}
+
+
+function system_clean
+{
+    echo -e $Y"· Removing orphan packages ..."$F
+    apt -y --purge autoremove
+
+    echo -e $Y"· Cleaning apt cache..."$F
+    apt -y clean
+
+    echo -e $Y"· Removing old packages..."$F
+    apt -y autoclean
+    # --- DEV --- #
+    echo -e $Y"· Removing old configuration files..."$F
+    sudo deborphan -n --find-config | xargs sudo apt-get -y --purge autoremove
+
+    purge_old_kernels
+}
+
+
+function user_trash_clean
+{
+    echo -e $Y"· Emptying trash..."$F
+    rm -rf /home/*/.local/share/Trash/*
+    rm -rf /root/.local/share/Trash/*
+
+    echo -e $Y"· Removing thumbnails..."$F
     rm -rf /home/*/.thumbnails/large/*
     rm -rf /home/*/.thumbnails/normal/*
 
-    echo -e $Y'Cleaning cache...'$F
+    echo -e $Y"· Cleaning cache..."$F
     rm -rf /home/*/.cache/*
 
-    echo -e $Y'Cleaning temporal files...'$F
+    echo -e $Y"· Cleaning temporal files..."$F
     rm -rf /tmp/*
     rm -rf /var/tmp/*
+}
 
-    echo -e $Y'Cleaning logs...(if exists in this system)'$F
-    rm /usr/bin/TEST.log
-    rm /usr/bin/RECV.log
-    rm /usr/bin/SENT.log
+function maintenance
+{    
+    echo -e $Y"--- Xubucleaner ---"$F
+    echo -e $Y"· Starting maintenance..."$F
+
+    user_trash_clean
+    system_clean
+
+    echo -e $Y"· Fixing damaged packages (if there are)..."$F
+    apt --allow-downgrades --allow-change-held-packages -f install
+    dpkg --configure -a
+    apt-get check
+
+    echo -e $Y"· Getting repository lists..."$F
+    apt update
+
+    echo -e $Y"· Updating programs and kernel..."$F
+    apt --allow-downgrades --allow-change-held-packages -y full-upgrade
+
+    system_clean
+
+    # Check to see if a reboot is required.
+    if [ -f /var/run/reboot-required ]; then
+        echo -e $Y"·! YOU SHOULD REBOOT THE SYSTEM TO FINISH APPLYING UPDATES!"$F
+    fi
 }
 
 if [ $USER != root ]; then
-  echo -e $R'Error: You must be root'
-  echo -e $Y'Exiting...'$F
-  notify-send 'Xubucleaner' 'You must execute this script as root'
+  echo -e $R"-! Error: You must be root."
+  echo -e $Y"· Exiting..."$F
   exit 0
 fi
 clear
-notify-send 'Xubucleaner' 'Starting maintenance...'
 
-echo -e $Y'Emptying trash...'$F
-rm -rf /home/*/.local/share/Trash/*
-rm -rf /root/.local/share/Trash/*
+maintenance
 
-clean
-
-echo -e $Y'Fixing damaged packages (if exists)...'$F
-apt --allow-downgrades --allow-change-held-packages -f install
-dpkg --configure -a
-apt-get check
-
-echo -e $Y'Getting repository lists...'$F
-apt update
-
-echo -e $Y'Updating programs and kernel...'$F
-apt --allow-downgrades --allow-change-held-packages -y dist-upgrade
-
-clean
-
-echo -e $Y'--- YOU SHOULD REBOOT THE SYSTEM ---!'$F
-echo -e $Y'Script execution done - edited by: Carlos A. Planchón!'$F
-notify-send 'Xubucleaner' 'Ready!'
+echo -e $Y"· Script execution done - edited by: Carlos A. Planchón!"$F
+echo -e $Y"· Xubucleaner > Ready!"$F
